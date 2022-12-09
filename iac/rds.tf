@@ -73,4 +73,19 @@ locals {
   db_identifier = "backend-app-mysql-db"
 }
 
+output "rds_endpoint" {
+  value = aws_db_instance.db_instance.endpoint
+}
 
+output "rds_username" {
+  value = aws_db_instance.db_instance.username
+}
+
+output "rds_password" {
+  value     = aws_db_instance.db_instance.password
+  sensitive = true
+}
+
+output "rds_dbname" {
+  value     = aws_db_instance.db_instance.db_name
+}
