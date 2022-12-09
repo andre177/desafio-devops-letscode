@@ -37,6 +37,7 @@ jobs:
         chmod 400 ~/aws.pem
         cat ~/aws.pem
         sshuttle -r ubuntu@34.235.144.50 10.10.0.0/24 -vv --ssh-cmd 'ssh -i ~/aws.pem  -o StrictHostKeyChecking=accept-new' &
+        sleep 20
 
     - name: Terraform apply
       run: terraform apply --auto-approve
