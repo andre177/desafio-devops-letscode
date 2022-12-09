@@ -36,7 +36,7 @@ jobs:
         aws secretsmanager get-secret-value --secret-id $PRIVATE_KEY_ARN --query SecretString --output text > ~/aws.pem
         chmod 400 ~/aws.pem
         cat ~/aws.pem
-        sshuttle -r ubuntu@54.167.201.143 10.10.0.0/24 -vv --ssh-cmd 'ssh -i ~/aws.pem  -o StrictHostKeyChecking=accept-new' &
+        sshuttle -r ubuntu@34.235.144.50 10.10.0.0/24 -vv --ssh-cmd 'ssh -i ~/aws.pem  -o StrictHostKeyChecking=accept-new' &
 
     - name: Terraform apply
       run: terraform apply --auto-approve
