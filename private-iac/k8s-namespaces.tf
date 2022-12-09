@@ -1,4 +1,4 @@
-resource "kubernetes_namespace" "ada_apps" {
+resource "kubernetes_namespace" "ada_apps_namespace" {
   metadata {
     annotations = {
       name = var.ada_namespace
