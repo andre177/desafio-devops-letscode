@@ -30,7 +30,8 @@ jobs:
 
     - name: Connect to Bastion Host
       run: |
-        apt-get update && apt-get -y install sshuttle
+        whoami
+        sudo apt-get update && apt-get -y install sshuttle
         aws secretsmanager get-secret-value --secret-id $PRIVATE_KEY_ARN --query SecretString --output text > ~/aws.pem
         chmod 400 ~/aws.pem
         sshuttle -r ubuntu@54.167.201.143 10.10.0.0/24 -vv --ssh-cmd 'ssh -i ~/aws.pem'
