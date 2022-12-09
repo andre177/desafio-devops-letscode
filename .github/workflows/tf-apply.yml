@@ -7,7 +7,7 @@ defaults:
 on:
   push:
     branches:
-    - feature/aws-vpc
+    - feature/rds-mysql
 
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
