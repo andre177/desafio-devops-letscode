@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: letscode-by-ada
+  profiles: default, local, develop
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+  datasource:
+    url: ${MYSQL_DB_HOST}
+    username: ${MYSQL_DB_USER}
+    password: ${MYSQL_DB_PASS}
+
+security:
+  oauth2:
+    client:
+      scope: password
+  jwt:
+    signing-key: Y2FiZcOnYSBkYSBvbsOnYQ==
