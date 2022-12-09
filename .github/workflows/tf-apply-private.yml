@@ -19,7 +19,7 @@ env:
 
 jobs:
   TerraformApplyPrivate:
-    name: Apply Terraform manifest
+    name: Apply Terraform manifest for private resources
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
