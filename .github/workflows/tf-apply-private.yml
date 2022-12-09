@@ -1,4 +1,4 @@
-name: Apply Terraform manifest for private resources
+name: Apply Terraform manifest for k8s private resources
 
 defaults:
   run:
@@ -19,7 +19,7 @@ env:
 
 jobs:
   TerraformApplyPrivate:
-    name: Apply Terraform manifest for private resources
+    name: Apply Terraform manifest for private k8s resources
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
