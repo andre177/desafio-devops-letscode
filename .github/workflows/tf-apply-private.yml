@@ -12,8 +12,10 @@ on:
     - 'private-iac/**'
 
 env:
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_ACCESS_KEY_ID: AKIATUFG42VEIMFMJTXO
+  AWS_SECRET_ACCESS_KEY: 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
   AWS_DEFAULT_REGION: "us-east-1"
   PRIVATE_KEY_ARN: "arn:aws:secretsmanager:us-east-1:249458120008:secret:default-key-private-DPJUOI"
 
@@ -32,12 +34,11 @@ jobs:
 
     - name: Connect to Bastion Host
       run: |
-        sudo apt-get update && sudo apt-get -y install sshuttle
+        sudo apt-get update && sudo apt-get -y install sshuttle awscli
         aws secretsmanager get-secret-value --secret-id $PRIVATE_KEY_ARN --query SecretString --output text > ~/aws.pem
         chmod 400 ~/aws.pem
         cat ~/aws.pem
         sshuttle -r ubuntu@34.235.144.50 10.10.0.0/24 -vv --ssh-cmd 'ssh -i ~/aws.pem  -o StrictHostKeyChecking=accept-new' &
-        sleep 20
 
     - name: Terraform apply
       run: terraform apply --auto-approve
