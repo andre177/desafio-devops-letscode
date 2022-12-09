@@ -5,5 +5,6 @@ module "key_pair" {
 }
 
 output "key_pair_private_pem" {
-  value = module.key_pair.private_key_pem
+  value     = module.key_pair.private_key_pem
+  sensitive = true
 }
