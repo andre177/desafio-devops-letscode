@@ -28,13 +28,13 @@ jobs:
     - name: Terraform Init
       run: terraform init
 
-    - name: Connect to Bastion Host
-      run: |
-        sudo apt-get update && sudo apt-get -y install sshuttle
-        aws secretsmanager get-secret-value --secret-id $PRIVATE_KEY_ARN --query SecretString --output text > ~/aws.pem
-        chmod 400 ~/aws.pem
-        cat ~/aws.pem
-        sshuttle -r ubuntu@54.167.201.143 10.10.0.0/24 -vv --ssh-cmd 'ssh -i ~/aws.pem  -o StrictHostKeyChecking=accept-new' &
+    #- name: Connect to Bastion Host
+    #  run: |
+    #    sudo apt-get update && sudo apt-get -y install sshuttle
+    #    aws secretsmanager get-secret-value --secret-id $PRIVATE_KEY_ARN --query SecretString --output text > ~/aws.pem
+    #    chmod 400 ~/aws.pem
+    #    cat ~/aws.pem
+    #    sshuttle -r ubuntu@54.167.201.143 10.10.0.0/24 -vv --ssh-cmd 'ssh -i ~/aws.pem  -o StrictHostKeyChecking=accept-new' &
 
     - name: Terraform apply
       run: terraform apply --auto-approve
