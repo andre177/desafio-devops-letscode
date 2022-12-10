@@ -6,3 +6,7 @@ data "terraform_remote_state" "base_iac" {
     region = "us-east-1"
   }
 }
+
+data "aws_caller_identity" "current" {}
+
+data "aws_ecr_authorization_token" "ecr_password" {}
