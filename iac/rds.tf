@@ -51,6 +51,14 @@ resource "aws_security_group" "rds_sg" {
   vpc_id      = module.vpc.vpc_id
 
   ingress {
+    description     = "Allow all traffic from bastion host"
+    from_port       = 0
+    to_port         = 65535
+    protocol        = "tcp"
+    security_groups = [aws_security_group.bastion_host_sg.id]
+  }
+
+  ingress {
     description = "Security Group for RDS instance named ${local.db_identifier}"
     from_port   = local.port
     to_port     = local.port

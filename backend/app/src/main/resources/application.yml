@@ -3,6 +3,7 @@ spring:
     name: letscode-by-ada
   profiles: default, local, develop
   jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: update
     properties:
