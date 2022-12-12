@@ -61,7 +61,7 @@ jobs:
         aws secretsmanager get-secret-value --secret-id $PRIVATE_KEY_ARN --query SecretString --output text > ~/aws.pem
         chmod 400 ~/aws.pem
         cat ~/aws.pem
-        sshuttle -r ubuntu@$BASTION_HOST_IP 10.10.0.0/24 -vv --ssh-cmd 'ssh -i ~/aws.pem  -o StrictHostKeyChecking=accept-new' &
+        sshuttle -r ubuntu@"$BASTION_HOST_IP" 10.10.0.0/24 -vv --ssh-cmd 'ssh -i ~/aws.pem  -o StrictHostKeyChecking=accept-new' &
 
     - name: Apply k8s deployment
       run: |
