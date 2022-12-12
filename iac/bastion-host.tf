@@ -12,6 +12,11 @@ chmod 400 /home/ubuntu/.ssh/aws.pem
 EOF
 }
 
+resource "github_actions_secret" "bastion_host_ip_secret" {
+  repository      = "desafio-devops-letscode"
+  secret_name     = "BASTION_HOST_IP"
+  plaintext_value = aws_instance.bastion_host.public_ip
+}
 
 resource "aws_security_group" "bastion_host_sg" {
   name        = "ec2-${local.bastion_host_name}"

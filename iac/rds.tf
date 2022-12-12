@@ -66,6 +66,14 @@ resource "aws_security_group" "rds_sg" {
     cidr_blocks = var.private_subnets_cidrs
   }
 
+  ingress {
+    description = "Allow traffic from k8s pods"
+    from_port   = local.port
+    to_port     = local.port
+    protocol    = "tcp"
+    cidr_blocks = ["10.244.0.0/16"]
+  }
+
   egress {
     from_port        = 0
     to_port          = 0
@@ -95,5 +103,5 @@ output "rds_password" {
 }
 
 output "rds_dbname" {
-  value     = aws_db_instance.db_instance.db_name
+  value = aws_db_instance.db_instance.db_name
 }

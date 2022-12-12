@@ -1,6 +1,6 @@
-resource "time_sleep" "wait_180_seconds" {
+resource "time_sleep" "wait_240_seconds" {
   depends_on      = [aws_instance.k8s_master_node]
-  create_duration = "180s"
+  create_duration = "240s"
 }
 
 resource "aws_instance" "k8s_worker_node" {
@@ -18,7 +18,7 @@ resource "aws_instance" "k8s_worker_node" {
     ]
   }
   depends_on = [
-    time_sleep.wait_180_seconds,
+    time_sleep.wait_240_seconds,
     aws_instance.k8s_master_node
   ]
   tags = {
@@ -29,10 +29,10 @@ resource "aws_instance" "k8s_worker_node" {
 #!/bin/bash
 swapoff -a
 hostnamectl set-hostname ${local.k8s_worker_node_name}${count.index}
-apt-get update && apt-get install -y apt-transport-https gnupg2 awscli
+apt-get update && apt-get install -y apt-transport-https gnupg2 awscli docker.io
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 echo 'deb https://apt.kubernetes.io/ kubernetes-xenial main' | tee -a /etc/apt/sources.list.d/kubernetes.list
-apt-get update && apt-get install -y kubectl kubeadm kubelet kubernetes-cni docker.io
+apt-get update && apt-get install -y kubectl kubeadm kubelet=1.25.5-00 kubernetes-cni
 systemctl start docker
 systemctl enable docker
 cat << EOF | sudo tee /etc/sysctl.d/k8s.conf
@@ -45,6 +45,7 @@ systemctl daemon-reload
 systemctl restart docker
 systemctl restart kubelet
 export AWS_DEFAULT_REGION=${var.aws_region}
+sleep 180
 aws secretsmanager get-secret-value --secret-id "${aws_secretsmanager_secret.k8s_join_secret.arn}" --query SecretString --output text | bash
 END
 }
@@ -55,19 +56,12 @@ resource "aws_security_group" "k8s_worker_node_sg" {
   vpc_id      = module.vpc.vpc_id
 
   ingress {
-    description = "Allow only ssh from public subnets"
-    from_port   = var.ssh_port
-    to_port     = var.ssh_port
-    protocol    = "tcp"
-    cidr_blocks = var.public_subnets_cidrs
-  }
-
-  ingress {
-    description = "Allow all traffic for internal subnets"
-    from_port   = 0
-    to_port     = 65535
-    protocol    = "tcp"
-    cidr_blocks = var.private_subnets_cidrs
+    description     = "Allow all traffic"
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
   }
 
   egress {

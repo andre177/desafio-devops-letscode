@@ -4,6 +4,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "4.45.0"
     }
+    github = {
+      source  = "integrations/github"
+      version = "5.12.0"
+    }
   }
 }
 

@@ -13,12 +13,12 @@ resource "aws_instance" "k8s_master_node" {
   user_data = <<END
 #!/bin/bash
 swapoff -a
-hostnamectl set-hostname master
+hostnamectl set-hostname master && bash
 export AWS_DEFAULT_REGION=${var.aws_region}
-apt-get update && apt-get install -y apt-transport-https gnupg2 awscli
+apt-get update && apt-get install -y apt-transport-https gnupg2 awscli docker.io
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 echo 'deb https://apt.kubernetes.io/ kubernetes-xenial main' | tee -a /etc/apt/sources.list.d/kubernetes.list
-apt-get update && apt-get install -y kubectl kubeadm kubelet kubernetes-cni docker.io
+apt-get update && apt-get install -y kubectl kubeadm kubelet=1.25.5-00 kubernetes-cni
 systemctl start docker
 systemctl enable docker
 cat << EOF | sudo tee /etc/sysctl.d/k8s.conf
@@ -31,12 +31,15 @@ systemctl daemon-reload
 systemctl restart docker
 systemctl restart kubelet
 INSTANCE_IP=$(ip addr | grep 10.10.0 | awk '{print $2}'  | awk -F / '{print $1}')
-kubeadm init --apiserver-advertise-address=$INSTANCE_IP --pod-network-cidr=${var.vpc_cidr} --ignore-preflight-errors=NumCPU --ignore-preflight-errors=Mem
+kubeadm init --apiserver-advertise-address=$INSTANCE_IP --pod-network-cidr=10.244.0.0/16 --ignore-preflight-errors=NumCPU --ignore-preflight-errors=Mem
 aws secretsmanager update-secret --secret-id "${aws_secretsmanager_secret.k8s_join_secret.arn}" --secret-string "$(kubeadm token create --print-join-command)"
 mkdir ~/.kube
 cp -i /etc/kubernetes/admin.conf ~/.kube/config
 export KUBECONFIG=/etc/kubernetes/admin.conf
 kubectl apply -f https://github.com/coreos/flannel/raw/master/Documentation/kube-flannel.yml
+aws secretsmanager update-secret --secret-id "${aws_secretsmanager_secret.k8s_cluster_ca_certificate.arn}" --secret-string "$(kubectl config view --minify --raw --output 'jsonpath={..cluster.certificate-authority-data}')"
+aws secretsmanager update-secret --secret-id "${aws_secretsmanager_secret.k8s_client_certificate.arn}" --secret-string "$(kubectl config view --minify --raw --output 'jsonpath={..user.client-certificate-data}')"
+aws secretsmanager update-secret --secret-id "${aws_secretsmanager_secret.k8s_client_key.arn}" --secret-string "$(kubectl config view --minify --raw --output 'jsonpath={..user.client-key-data}')"
 END
 }
 
@@ -46,19 +49,12 @@ resource "aws_security_group" "k8s_master_node_sg" {
   vpc_id      = module.vpc.vpc_id
 
   ingress {
-    description     = "Allow all traffic from bastion host"
+    description     = "Allow all traffic"
     from_port       = 0
-    to_port         = 65535
-    protocol        = "tcp"
-    security_groups = [aws_security_group.bastion_host_sg.id]
-  }
-
-  ingress {
-    description = "Allow all traffic for internal subnets"
-    from_port   = 0
-    to_port     = 65535
-    protocol    = "tcp"
-    cidr_blocks = var.private_subnets_cidrs
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
   }
 
   egress {
@@ -69,6 +65,11 @@ resource "aws_security_group" "k8s_master_node_sg" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
+}
+
+output "k8s_master_node_ip" {
+  value = aws_instance.k8s_master_node.private_ip
+  
 }
 
 locals {
