@@ -61,8 +61,8 @@ resource "kubernetes_service" "backend_app" {
   }
 }
 
-output "loadbalancer_url" {
-  value = kubernetes_service.backend_app.spec
+output "load_balancer_hostname" {
+  value = kubernetes_service.backend_app.status.0.load_balancer.0.ingress.0.hostname
 }
 
 locals {
