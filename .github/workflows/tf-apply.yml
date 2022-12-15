@@ -6,8 +6,9 @@ defaults:
 
 on:
   push:
+    workflow_dispatch:
     branches:
-    - feature/backend-app
+    - main
     paths:
     - 'iac/**'
 
