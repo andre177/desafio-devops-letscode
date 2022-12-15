@@ -13,17 +13,53 @@ resource "aws_iam_role" "k8s_node" {
   })
 }
 
-resource "aws_iam_policy" "node" {
-  name   = "node-k8s-policy"
+resource "aws_iam_policy" "k8s_node" {
+  name   = "k8s-node-policy"
   policy = <<EOF
 {
-	"Version": "2012-10-17",
-	"Statement": [{
-		"Sid": "K8sNodeDescribeResources",
-		"Effect": "Allow",
-		"Action": ["ec2:DescribeInstances", "ec2:DescribeRegions"],
-		"Resource": "*"
-	}]
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "s3:*",
+      "Resource": [
+        "arn:aws:s3:::kubernetes-*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": "ec2:Describe*",
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "ec2:AttachVolume",
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "ec2:DetachVolume",
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["route53:*"],
+      "Resource": ["*"]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ecr:GetAuthorizationToken",
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:GetRepositoryPolicy",
+        "ecr:DescribeRepositories",
+        "ecr:ListImages",
+        "ecr:BatchGetImage"
+      ],
+      "Resource": "*"
+    }
+  ]
 }
 EOF
 }
@@ -66,15 +102,5 @@ resource "aws_iam_role_policy_attachment" "k8s_node_role_k8s_join_secret_ro_poli
 
 resource "aws_iam_role_policy_attachment" "k8s_node_role_node_policy" {
   role       = aws_iam_role.k8s_node.name
-  policy_arn = aws_iam_policy.node.arn
-}
-
-resource "aws_iam_role_policy_attachment" "k8s_node_role_ecr_policy" {
-  role       = aws_iam_role.k8s_node.name
-  policy_arn = aws_iam_policy.ecr.arn
-}
-
-resource "aws_iam_role_policy_attachment" "k8s_node_role_cni_policy" {
-  role       = aws_iam_role.k8s_node.name
-  policy_arn = aws_iam_policy.cni.arn
+  policy_arn = aws_iam_policy.k8s_node.arn
 }

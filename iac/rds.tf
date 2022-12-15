@@ -51,11 +51,27 @@ resource "aws_security_group" "rds_sg" {
   vpc_id      = module.vpc.vpc_id
 
   ingress {
+    description     = "Allow all traffic from bastion host"
+    from_port       = 0
+    to_port         = 65535
+    protocol        = "tcp"
+    security_groups = [aws_security_group.bastion_host_sg.id]
+  }
+
+  ingress {
     description = "Security Group for RDS instance named ${local.db_identifier}"
     from_port   = local.port
     to_port     = local.port
     protocol    = "tcp"
     cidr_blocks = var.private_subnets_cidrs
+  }
+
+  ingress {
+    description = "Allow traffic from k8s pods"
+    from_port   = local.port
+    to_port     = local.port
+    protocol    = "tcp"
+    cidr_blocks = ["10.244.0.0/16"]
   }
 
   egress {
@@ -73,4 +89,19 @@ locals {
   db_identifier = "backend-app-mysql-db"
 }
 
+output "rds_endpoint" {
+  value = aws_db_instance.db_instance.endpoint
+}
 
+output "rds_username" {
+  value = aws_db_instance.db_instance.username
+}
+
+output "rds_password" {
+  value     = aws_db_instance.db_instance.password
+  sensitive = true
+}
+
+output "rds_dbname" {
+  value = aws_db_instance.db_instance.db_name
+}
