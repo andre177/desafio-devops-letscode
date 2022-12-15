@@ -53,11 +53,11 @@ resource "aws_security_group" "k8s_master_node_sg" {
   vpc_id      = module.vpc.vpc_id
 
   ingress {
-    description     = "Allow all traffic"
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    description      = "Allow all traffic"
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]
   }
 
@@ -73,7 +73,7 @@ resource "aws_security_group" "k8s_master_node_sg" {
 
 output "k8s_master_node_ip" {
   value = aws_instance.k8s_master_node.private_ip
-  
+
 }
 
 locals {
