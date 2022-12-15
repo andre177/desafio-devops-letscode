@@ -20,8 +20,9 @@ resource "kubernetes_deployment" "backend_app" {
       }
       spec {
         container {
-          image = "${data.aws_caller_identity.current.account_id}.dkr.ecr.us-east-1.amazonaws.com/${local.app_name}:latest"
-          name  = local.app_name
+          image             = "${data.aws_caller_identity.current.account_id}.dkr.ecr.us-east-1.amazonaws.com/${local.app_name}:latest"
+          name              = local.app_name
+          image_pull_policy = "always"
 
           liveness_probe {
             http_get {
