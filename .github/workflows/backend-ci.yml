@@ -15,7 +15,7 @@ on:
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  PRIVATE_KEY_ARN: ${{ secrets.PRIVATE_KEY_ARN }}
+  #PRIVATE_KEY_ARN: ${{ secrets.PRIVATE_KEY_ARN }}
   AWS_DEFAULT_REGION: "us-east-1"
 
 jobs:
@@ -56,9 +56,9 @@ jobs:
     - name: Connect to Bastion Host
       run: |
         sudo apt-get update && sudo apt-get -y install sshuttle awscli
-        aws secretsmanager get-secret-value --secret-id ${{ env.PRIVATE_KEY_ARN }} --query SecretString --output text > ~/aws.pem
+        aws secretsmanager get-secret-value --secret-id ${{ secrets.PRIVATE_KEY_ARN }} --query SecretString --output text > ~/aws.pem
         chmod 400 ~/aws.pem
-        sshuttle -r ubuntu@"$BASTION_HOST_IP" 10.10.0.0/24 -vv --ssh-cmd 'ssh -i ~/aws.pem  -o StrictHostKeyChecking=accept-new' &
+        sshuttle -r ubuntu@${{ secrets.BASTION_HOST_IP }} 10.10.0.0/24 -vv --ssh-cmd 'ssh -i ~/aws.pem  -o StrictHostKeyChecking=accept-new' &
         ls -ltr
 
     #- name: Rollout K8s deployment
