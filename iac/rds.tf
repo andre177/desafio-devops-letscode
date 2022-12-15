@@ -29,13 +29,16 @@ resource "random_password" "password" {
   special = false
 }
 
-resource "aws_secretsmanager_secret" "secret_name" {
+resource "aws_secretsmanager_secret" "rds_secret" {
   name       = aws_db_instance.db_instance.identifier
   depends_on = [aws_db_instance.db_instance]
+  rotation_rules {
+    automatically_after_days = 0
+  }
 }
 
-resource "aws_secretsmanager_secret_version" "secret_value" {
-  secret_id     = aws_secretsmanager_secret.secret_name.id
+resource "aws_secretsmanager_secret_version" "rds_credentials" {
+  secret_id     = aws_secretsmanager_secret.rds_secret.id
   depends_on    = [aws_db_instance.db_instance]
   secret_string = <<EOF
    {
@@ -81,7 +84,6 @@ resource "aws_security_group" "rds_sg" {
     cidr_blocks      = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]
   }
-
 }
 
 locals {

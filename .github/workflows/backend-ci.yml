@@ -2,6 +2,7 @@ name: Build backend app and deploy
 
 defaults:
   run:
+    workflow_dispatch:
     working-directory: "backend/app/"
 
 on:
