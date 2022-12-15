@@ -13,6 +13,12 @@ resource "aws_secretsmanager_secret" "default_key_private" {
   }
 }
 
+resource "github_actions_secret" "private_key_github_secret" {
+  repository      = "desafio-devops-letscode"
+  secret_name     = "PRIVATE_KEY_ARN"
+  plaintext_value = aws_secretsmanager_secret.default_key_private.arn
+}
+
 resource "aws_secretsmanager_secret_version" "default_key_private_value" {
   secret_id     = aws_secretsmanager_secret.default_key_private.id
   secret_string = module.key_pair.private_key_pem
