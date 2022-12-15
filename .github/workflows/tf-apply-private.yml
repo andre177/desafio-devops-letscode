@@ -12,8 +12,8 @@ on:
     - 'private-iac/**'
 
 env:
-  AWS_ACCESS_KEY_ID: "AKIATUFG42VEBMQFBVMF"
-  AWS_SECRET_ACCESS_KEY: "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"
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_DEFAULT_REGION: "us-east-1"
   PRIVATE_KEY_ARN: "arn:aws:secretsmanager:us-east-1:249458120008:secret:default-key-private-DPJUOI"
   BASTION_HOST_IP: ${{ secrets.BASTION_HOST_IP }}

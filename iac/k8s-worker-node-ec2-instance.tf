@@ -22,25 +22,26 @@ resource "aws_instance" "k8s_worker_node" {
     aws_instance.k8s_master_node
   ]
   tags = {
-    Name                                         = "worker${count.index}"
+    Name                                         = "${local.k8s_worker_node_name}-${count.index}"
     "kubernetes.io/cluster/ada-devops-challenge" = "owned"
   }
   user_data = <<END
 #!/bin/bash
 swapoff -a
-hostnamectl set-hostname ${local.k8s_worker_node_name}${count.index}
 apt-get update && apt-get install -y apt-transport-https gnupg2 awscli docker.io
+hostnamectl set-hostname $(curl http://169.254.169.254/latest/meta-data/hostname)
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 echo 'deb https://apt.kubernetes.io/ kubernetes-xenial main' | tee -a /etc/apt/sources.list.d/kubernetes.list
 apt-get update && apt-get install -y kubectl kubeadm kubelet=1.25.5-00 kubernetes-cni
 systemctl start docker
 systemctl enable docker
-cat << EOF | sudo tee /etc/sysctl.d/k8s.conf
+cat << EOF | tee /etc/sysctl.d/k8s.conf
 net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
 EOF
 kubeadm config images pull
 echo '{"exec-opts": ["native.cgroupdriver=systemd"]}' | tee /etc/docker/daemon.json
+echo 'KUBELET_EXTRA_ARGS=--cloud-provider=aws' > /etc/default/kubelet
 systemctl daemon-reload
 systemctl restart docker
 systemctl restart kubelet

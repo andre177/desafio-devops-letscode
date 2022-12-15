@@ -37,7 +37,6 @@ module "vpc" {
   dhcp_options_ntp_servers = ["200.160.7.186", "201.49.148.135", "200.186.125.195", "200.20.186.76"]
 
   tags = {
-    Name                                         = "default-vpc"
-    "kubernetes.io/cluster/ada-devops-challenge" = "shared"
+    id = "default-vpc"
   }
 }

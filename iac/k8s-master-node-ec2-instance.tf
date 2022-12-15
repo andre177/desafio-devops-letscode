@@ -13,20 +13,21 @@ resource "aws_instance" "k8s_master_node" {
   user_data = <<END
 #!/bin/bash
 swapoff -a
-hostnamectl set-hostname master && bash
 export AWS_DEFAULT_REGION=${var.aws_region}
 apt-get update && apt-get install -y apt-transport-https gnupg2 awscli docker.io
+hostnamectl set-hostname $(curl http://169.254.169.254/latest/meta-data/hostname)
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 echo 'deb https://apt.kubernetes.io/ kubernetes-xenial main' | tee -a /etc/apt/sources.list.d/kubernetes.list
 apt-get update && apt-get install -y kubectl kubeadm kubelet=1.25.5-00 kubernetes-cni
 systemctl start docker
 systemctl enable docker
-cat << EOF | sudo tee /etc/sysctl.d/k8s.conf
+cat << EOF | tee /etc/sysctl.d/k8s.conf
 net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
 EOF
 kubeadm config images pull
 echo '{"exec-opts": ["native.cgroupdriver=systemd"]}' | tee /etc/docker/daemon.json
+echo 'KUBELET_EXTRA_ARGS=--cloud-provider=aws' > /etc/default/kubelet
 systemctl daemon-reload
 systemctl restart docker
 systemctl restart kubelet
@@ -40,6 +41,9 @@ kubectl apply -f https://github.com/coreos/flannel/raw/master/Documentation/kube
 aws secretsmanager update-secret --secret-id "${aws_secretsmanager_secret.k8s_cluster_ca_certificate.arn}" --secret-string "$(kubectl config view --minify --raw --output 'jsonpath={..cluster.certificate-authority-data}')"
 aws secretsmanager update-secret --secret-id "${aws_secretsmanager_secret.k8s_client_certificate.arn}" --secret-string "$(kubectl config view --minify --raw --output 'jsonpath={..user.client-certificate-data}')"
 aws secretsmanager update-secret --secret-id "${aws_secretsmanager_secret.k8s_client_key.arn}" --secret-string "$(kubectl config view --minify --raw --output 'jsonpath={..user.client-key-data}')"
+sed -i '20i\    - --cloud-provider=aws' /etc/kubernetes/manifests/kube-controller-manager.yaml
+sed -i '20i\    - --cloud-provider=aws' /etc/kubernetes/manifests/kube-apiserver.yaml
+systemctl restart kubelet
 END
 }
 
