@@ -1,0 +1,22 @@
+version: 0.2
+env:
+  variables:
+    APP_NAME: "letscodebyada-app"
+phases:
+  install:
+    runtime-versions:
+      nodejs: 14.x
+    commands:
+      - echo install process started
+      - npm install && npm install -g @angular/cli
+  build:
+    commands:
+      - echo build process started now
+      - ls
+      - cd letscodebyada-app
+      - ng build --configuration=production
+  post_build:
+    commands:
+      - echo Arquivos Buildado
+      - ls -la
+      - echo finalizado com sucesso 

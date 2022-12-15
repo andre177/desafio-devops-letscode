@@ -1,0 +1,40 @@
+<div id="layoutSidenav_nav">
+    <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+        <div class="sb-sidenav-menu">
+            <div class="nav">
+                <div class="sb-sidenav-menu-heading">Sistema de Gerenciamento</div>
+                <a class="nav-link" routerLink="/home"
+                    ><div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                    Home</a
+                >
+                <div class="sb-sidenav-menu-heading">Cadastros</div>
+                    <a class="nav-link collapsed" routerLink="" data-toggle="collapse" data-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
+                        <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
+                        Professores
+                        <div class="sb-sidenav-collapse-arrow">
+                            <i class="fas fa-angle-down">
+
+                            </i></div>
+                    </a>
+                    
+                    <div class="sb-sidenav-menu-heading">Logout</div>
+                    <a class="nav-link collapsed" (click)="logout();" href="#"
+                    data-toggle="collapse" data-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
+                        <div class="sb-nav-link-icon"><i class="fas fa-sign-out-alt"></i></div>
+                        Sair    
+                    </a>
+                    
+            </div>
+        </div>
+        <div class="sb-sidenav-footer">
+            <div class="small"> Usuário Logado</div>
+            {{ usuarioLogado }}
+        </div>
+        <div class="sb-sidenav-footer">
+            <div class="container sidebar-footer">
+                <img src="../../../assets/logo.jpg" alt="logo"  width=155 height=100> 
+        
+            </div>
+        </div>
+    </nav>
+</div>

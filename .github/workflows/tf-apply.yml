@@ -5,9 +5,10 @@ defaults:
     working-directory: "iac/"
 
 on:
+  workflow_dispatch:
   push:
     branches:
-    - feature/backend-app
+    - main
     paths:
     - 'iac/**'
 
