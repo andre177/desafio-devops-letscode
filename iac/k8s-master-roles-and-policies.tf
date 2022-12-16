@@ -179,3 +179,34 @@ resource "aws_iam_role_policy_attachment" "k8s_master_role_k8s_cluster_ca_certif
   role       = aws_iam_role.k8s_master.name
   policy_arn = aws_iam_policy.k8s_cluster_ca_certificate_rw.arn
 }
+
+resource "aws_iam_policy" "k8s_kubeconfig_rw" {
+  name   = "k8s-kubeconfig-rw-policy"
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "secretsmanager:GetRandomPassword",
+                "secretsmanager:ListSecrets"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": "secretsmanager:*",
+            "Resource": "${aws_secretsmanager_secret.k8s_kubeconfig.arn}"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "k8s_master_role_k8s_kubeconfig_rw_policy" {
+  role       = aws_iam_role.k8s_master.name
+  policy_arn = aws_iam_policy.k8s_kubeconfig_rw.arn
+}

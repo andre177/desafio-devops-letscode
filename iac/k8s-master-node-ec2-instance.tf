@@ -1,5 +1,6 @@
 resource "aws_instance" "k8s_master_node" {
   ami                         = "ami-0a6b2839d44d781b2"
+# using t2.micro because of free tier
   instance_type               = "t2.micro"
   vpc_security_group_ids      = [aws_security_group.k8s_master_node_sg.id]
   subnet_id                   = module.vpc.private_subnets[0]
@@ -38,6 +39,7 @@ mkdir ~/.kube
 cp -i /etc/kubernetes/admin.conf ~/.kube/config
 export KUBECONFIG=/etc/kubernetes/admin.conf
 kubectl apply -f https://github.com/coreos/flannel/raw/master/Documentation/kube-flannel.yml
+aws secretsmanager update-secret --secret-id "${aws_secretsmanager_secret.k8s_kubeconfig.arn}" --secret-string "$(cat /etc/kubernetes/admin.conf)"
 aws secretsmanager update-secret --secret-id "${aws_secretsmanager_secret.k8s_cluster_ca_certificate.arn}" --secret-string "$(kubectl config view --minify --raw --output 'jsonpath={..cluster.certificate-authority-data}')"
 aws secretsmanager update-secret --secret-id "${aws_secretsmanager_secret.k8s_client_certificate.arn}" --secret-string "$(kubectl config view --minify --raw --output 'jsonpath={..user.client-certificate-data}')"
 aws secretsmanager update-secret --secret-id "${aws_secretsmanager_secret.k8s_client_key.arn}" --secret-string "$(kubectl config view --minify --raw --output 'jsonpath={..user.client-key-data}')"
