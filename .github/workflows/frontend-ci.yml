@@ -1,0 +1,68 @@
+name: Build frontend app and deploy
+
+defaults:
+  run:
+    working-directory: "frontend/"
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+    - main
+    paths:
+    - 'frontend/**'
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: "us-east-1"
+
+jobs:
+  BuildAndDeploy:
+    name: Build backend app and deploy
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up nodejs 14
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 14
+
+    - name: Getting dependencies
+      run: |
+        cd app/
+        npm install
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_DEFAULT_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push image to Amazon ECR
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      run: |
+        cd ..
+        docker build -t ${{ env.ECR_REGISTRY }}/frontend-app:latest .
+        docker push ${{ env.ECR_REGISTRY }}/frontend-app:latest
+
+    - name: Connect to Bastion Host
+      run: |
+        sudo apt-get update && sudo apt-get -y install sshuttle awscli
+        aws secretsmanager get-secret-value --secret-id ${{ secrets.PRIVATE_KEY_ARN }} --query SecretString --output text > ~/aws.pem
+        chmod 400 ~/aws.pem
+        sshuttle -r ubuntu@${{ secrets.BASTION_HOST_IP }} 10.10.0.0/24 -vv --ssh-cmd 'ssh -i ~/aws.pem  -o StrictHostKeyChecking=accept-new' &
+
+    - name: Rollout K8s deployment
+      run: |
+        mkdir ~/.kube
+        aws secretsmanager get-secret-value --secret-id ${{ secrets.KUBECONFIG }} --query SecretString --output text > ~/.kube/config
+        kubectl rollout restart deployment frontend-app -n ada-apps
