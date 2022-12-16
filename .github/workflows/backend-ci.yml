@@ -63,4 +63,4 @@ jobs:
       run: |
         mkdir ~/.kube
         aws secretsmanager get-secret-value --secret-id ${{ secrets.KUBECONFIG }} --query SecretString --output text > ~/.kube/config
-        kubectl rollout restart deployment backend-app
+        kubectl rollout restart deployment backend-app -n ada-apps
