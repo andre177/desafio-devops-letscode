@@ -32,9 +32,7 @@ resource "random_password" "password" {
 resource "aws_secretsmanager_secret" "rds_secret" {
   name       = aws_db_instance.db_instance.identifier
   depends_on = [aws_db_instance.db_instance]
-  rotation_rules {
-    automatically_after_days = 0
-  }
+  recovery_window_in_days = 0
 }
 
 resource "aws_secretsmanager_secret_version" "rds_credentials" {

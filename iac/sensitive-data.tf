@@ -1,23 +1,17 @@
 resource "aws_secretsmanager_secret" "k8s_join_secret" {
   name = "k8s-join-secret"
-  rotation_rules {
-    automatically_after_days = 0
-  }
+  recovery_window_in_days = 0
 }
 
 resource "aws_secretsmanager_secret" "default_key_private" {
   name       = "default-key-private"
   depends_on = [module.key_pair]
-  rotation_rules {
-    automatically_after_days = 0
-  }
+  recovery_window_in_days = 0
 }
 
 resource "aws_secretsmanager_secret" "k8s_kubeconfig" {
   name       = "k8s-kubeconfig"
-  rotation_rules {
-    automatically_after_days = 0
-  }
+  recovery_window_in_days = 0
 }
 
 resource "github_actions_secret" "k8s_kubeconfig" {
@@ -39,23 +33,17 @@ resource "aws_secretsmanager_secret_version" "default_key_private_value" {
 
 resource "aws_secretsmanager_secret" "k8s_client_certificate" {
   name = "k8s-client-certificate"
-  rotation_rules {
-    automatically_after_days = 0
-  }
+  recovery_window_in_days = 0
 }
 
 resource "aws_secretsmanager_secret" "k8s_client_key" {
   name = "k8s-client-key"
-  rotation_rules {
-    automatically_after_days = 0
-  }
+  recovery_window_in_days = 0
 }
 
 resource "aws_secretsmanager_secret" "k8s_cluster_ca_certificate" {
   name = "k8s-cluster-ca-certificate"
-  rotation_rules {
-    automatically_after_days = 0
-  }
+  recovery_window_in_days = 0
 }
 
 output "k8s_client_certificate_arn" {
