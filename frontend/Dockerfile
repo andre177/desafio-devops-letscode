@@ -1,4 +1,4 @@
-FROM node:14.21.2-bullseye
+FROM node:14-alpine
 RUN mkdir /opt/app
 COPY app/ /opt/app
 RUN npm install -g @angular/cli

@@ -1,5 +1,6 @@
 resource "aws_instance" "k8s_master_node" {
   ami                         = "ami-0a6b2839d44d781b2"
+# using t2.micro because of free tier
   instance_type               = "t2.micro"
   vpc_security_group_ids      = [aws_security_group.k8s_master_node_sg.id]
   subnet_id                   = module.vpc.private_subnets[0]

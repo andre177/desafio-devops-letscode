@@ -4,8 +4,10 @@ resource "time_sleep" "wait_240_seconds" {
 }
 
 resource "aws_instance" "k8s_worker_node" {
-  count                       = 1
+  count                       = 2
+# Deploying 2 workers because t2.micro can't handle frontend and backend apps. If using a larger instance, a single node is enough.
   ami                         = "ami-0a6b2839d44d781b2"
+# Using t2.micro because of free tier.
   instance_type               = "t2.micro"
   vpc_security_group_ids      = [aws_security_group.k8s_worker_node_sg.id]
   subnet_id                   = module.vpc.private_subnets[0]

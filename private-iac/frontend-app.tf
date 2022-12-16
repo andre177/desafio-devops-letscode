@@ -29,7 +29,7 @@ resource "kubernetes_deployment" "frontend_app" {
               path = "/login"
               port = local.frontend_app_port
             }
-
+          initial_delay_seconds = 40
           }
         }
         image_pull_secrets {
