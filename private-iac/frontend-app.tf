@@ -1,4 +1,5 @@
 resource "kubernetes_deployment" "frontend_app" {
+  wait_for_rollout = false
   metadata {
     name      = local.frontend_app_name
     namespace = var.ada_namespace
