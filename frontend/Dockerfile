@@ -4,4 +4,4 @@ COPY app/ /opt/app
 RUN npm install -g @angular/cli
 WORKDIR /opt/app
 EXPOSE 4200
-CMD ["ng", "serve"]
+CMD ["ng", "serve", "--host", "0.0.0.0"]
