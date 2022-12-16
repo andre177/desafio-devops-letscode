@@ -48,7 +48,7 @@ systemctl daemon-reload
 systemctl restart docker
 systemctl restart kubelet
 export AWS_DEFAULT_REGION=${var.aws_region}
-sleep 180
+sleep 60
 aws secretsmanager get-secret-value --secret-id "${aws_secretsmanager_secret.k8s_join_secret.arn}" --query SecretString --output text | bash
 END
 }
