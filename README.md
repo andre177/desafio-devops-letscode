@@ -22,7 +22,7 @@
 6. Executar os workflows `Build backend app and deploy` e `Build frontend app and deploy`. Após o término da execução, ambas aplicações estarão disponíveis. Acesse o frontend pela url do Load Balancer do service frontend-app;
 
 #### Observações:
-- Para acessar o cluster via kubectl ou Lens, recomendo tunelar seu tráfego usando [sshuttle](https://github.com/sshuttle/sshuttle). A private key estará no Secrets Manager:
+- Para acessar o cluster via kubectl ou Lens, recomendo tunelar seu tráfego usando [sshuttle](https://github.com/sshuttle/sshuttle) (essa private key também acesssa os nodes do cluster). A private key estará no Secrets Manager:
   - `sshuttle -r ubuntu@<ip-bastion-host> 10.10.0.0/24 -vv --ssh-cmd 'ssh -i <path-da-chave>'`
 - Para executar o projeto fora do GitHub Actions, execute primeiro o que está na pasta `iac/` e depois na pasta `private-iac/`;
 - O cluster será provisionado com 2 workers pois usei o free-tier da AWS e a instância disponível é a *t2.micro*. Ela não suporta as duas aplicações juntas no mesmo node. Eu recomendo fortemente o uso de instâncias maiores;
