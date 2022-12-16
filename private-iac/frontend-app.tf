@@ -23,14 +23,6 @@ resource "kubernetes_deployment" "frontend_app" {
           image             = "${data.aws_caller_identity.current.account_id}.dkr.ecr.us-east-1.amazonaws.com/${local.frontend_app_name}:latest"
           name              = local.frontend_app_name
           image_pull_policy = "Always"
-
-          liveness_probe {
-            http_get {
-              path = "/login"
-              port = local.frontend_app_port
-            }
-          initial_delay_seconds = 40
-          }
         }
         image_pull_secrets {
           name = "regcred"
