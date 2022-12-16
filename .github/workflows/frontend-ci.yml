@@ -19,7 +19,7 @@ env:
 
 jobs:
   BuildAndDeploy:
-    name: Build backend app and deploy
+    name: Build frontend app and deploy
     runs-on: ubuntu-latest
 
     steps:
