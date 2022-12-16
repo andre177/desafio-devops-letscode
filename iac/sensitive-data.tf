@@ -13,6 +13,19 @@ resource "aws_secretsmanager_secret" "default_key_private" {
   }
 }
 
+resource "aws_secretsmanager_secret" "k8s_kubeconfig" {
+  name       = "k8s-kubeconfig"
+  rotation_rules {
+    automatically_after_days = 0
+  }
+}
+
+resource "github_actions_secret" "k8s_kubeconfig" {
+  repository      = "desafio-devops-letscode"
+  secret_name     = "KUBECONFIG"
+  plaintext_value = aws_secretsmanager_secret.k8s_kubeconfig.arn
+}
+
 resource "github_actions_secret" "private_key_github_secret" {
   repository      = "desafio-devops-letscode"
   secret_name     = "PRIVATE_KEY_ARN"

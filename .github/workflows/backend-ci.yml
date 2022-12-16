@@ -15,7 +15,6 @@ on:
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #PRIVATE_KEY_ARN: ${{ secrets.PRIVATE_KEY_ARN }}
   AWS_DEFAULT_REGION: "us-east-1"
 
 jobs:
@@ -62,7 +61,6 @@ jobs:
 
     - name: Rollout K8s deployment
       run: |
-        ls -ltra ~
-    #    export KUBECONFIG=$(aws secretsmanager get-secret-value --secret-id ${{ secrets.KUBECONFIG_ARN }} --query SecretString --output text)
-    #    terraform init
-    #    terraform apply --auto-approve        
+        mkdir ~/.kube
+        aws secretsmanager get-secret-value --secret-id ${{ secrets.KUBECONFIG }} --query SecretString --output text > ~/.kube/config
+        kubectl get pods -n ada-apps
