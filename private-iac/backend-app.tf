@@ -1,39 +1,39 @@
 resource "kubernetes_deployment" "backend_app" {
   metadata {
-    name      = local.app_name
-    namespace = local.namespace
+    name      = local.backend_app_name
+    namespace = var.ada_namespace
   }
   spec {
     replicas = 1
     selector {
       match_labels = {
-        "app.kubernetes.io/name" = local.app_name
-        "app"                    = local.app_name
+        "app.kubernetes.io/name" = local.backend_app_name
+        "app"                    = local.backend_app_name
       }
     }
     template {
       metadata {
         labels = {
-          "app.kubernetes.io/name" = local.app_name
-          "app"                    = local.app_name
+          "app.kubernetes.io/name" = local.backend_app_name
+          "app"                    = local.backend_app_name
         }
       }
       spec {
         container {
-          image             = "${data.aws_caller_identity.current.account_id}.dkr.ecr.us-east-1.amazonaws.com/${local.app_name}:latest"
-          name              = local.app_name
+          image             = "${data.aws_caller_identity.current.account_id}.dkr.ecr.us-east-1.amazonaws.com/${local.backend_app_name}:latest"
+          name              = local.backend_app_name
           image_pull_policy = "Always"
 
           liveness_probe {
             http_get {
               path = "/actuator/health"
-              port = local.app_port
+              port = local.backend_app_port
             }
 
           }
           env_from {
             config_map_ref {
-              name = local.app_name
+              name = local.backend_app_name
             }
           }
         }
@@ -47,27 +47,26 @@ resource "kubernetes_deployment" "backend_app" {
 
 resource "kubernetes_service" "backend_app" {
   metadata {
-    name      = local.app_name
-    namespace = local.namespace
+    name      = local.backend_app_name
+    namespace = var.ada_namespace
   }
   spec {
     selector = {
-      app = local.app_name
+      app = local.backend_app_name
     }
     port {
       port        = 80
-      target_port = local.app_port
+      target_port = local.backend_app_port
     }
     type = "LoadBalancer"
   }
 }
 
-output "load_balancer_hostname" {
+output "backendapp_load_balancer_hostname" {
   value = kubernetes_service.backend_app.status.0.load_balancer.0.ingress.0.hostname
 }
 
 locals {
-  app_name  = "backend-app"
-  namespace = "ada-apps"
-  app_port  = 8080
+  backend_app_name = "backend-app"
+  backend_app_port = 8080
 }
