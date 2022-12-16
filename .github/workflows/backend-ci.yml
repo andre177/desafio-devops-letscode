@@ -59,12 +59,10 @@ jobs:
         aws secretsmanager get-secret-value --secret-id ${{ secrets.PRIVATE_KEY_ARN }} --query SecretString --output text > ~/aws.pem
         chmod 400 ~/aws.pem
         sshuttle -r ubuntu@${{ secrets.BASTION_HOST_IP }} 10.10.0.0/24 -vv --ssh-cmd 'ssh -i ~/aws.pem  -o StrictHostKeyChecking=accept-new' &
-        ls -ltr
 
-    #- name: Rollout K8s deployment
-    #  run: |
-    #    cd ../../private-iac
+    - name: Rollout K8s deployment
+      run: |
+        ls -ltra ~
+    #    export KUBECONFIG=$(aws secretsmanager get-secret-value --secret-id ${{ secrets.KUBECONFIG_ARN }} --query SecretString --output text)
     #    terraform init
-    #    terraform apply --auto-approve
-    #  continue-on-error: false
-        
+    #    terraform apply --auto-approve        
